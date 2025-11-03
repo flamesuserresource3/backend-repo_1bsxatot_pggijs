@@ -2,47 +2,31 @@
 Database Schemas
 
 Define your MongoDB collection schemas here using Pydantic models.
-These schemas are used for data validation in your application.
-
 Each Pydantic model represents a collection in your database.
-Model name is converted to lowercase for the collection name:
-- User -> "user" collection
-- Product -> "product" collection
-- BlogPost -> "blogs" collection
+Model name is converted to lowercase for the collection name.
 """
+from typing import List, Optional, Dict
+from pydantic import BaseModel, Field, EmailStr
 
-from pydantic import BaseModel, Field
-from typing import Optional
-
-# Example schemas (replace with your own):
-
-class User(BaseModel):
+class Lead(BaseModel):
     """
-    Users collection schema
-    Collection name: "user" (lowercase of class name)
+    Leads da clínica odontológica
+    Collection name: "lead"
     """
-    name: str = Field(..., description="Full name")
-    email: str = Field(..., description="Email address")
-    address: str = Field(..., description="Address")
-    age: Optional[int] = Field(None, ge=0, le=120, description="Age in years")
-    is_active: bool = Field(True, description="Whether user is active")
+    nome: str = Field(..., description="Nome completo do lead")
+    email: Optional[EmailStr] = Field(None, description="Email do lead")
+    telefone: Optional[str] = Field(None, description="Telefone/WhatsApp")
 
-class Product(BaseModel):
-    """
-    Products collection schema
-    Collection name: "product" (lowercase of class name)
-    """
-    title: str = Field(..., description="Product title")
-    description: Optional[str] = Field(None, description="Product description")
-    price: float = Field(..., ge=0, description="Price in dollars")
-    category: str = Field(..., description="Product category")
-    in_stock: bool = Field(True, description="Whether product is in stock")
+    motivo_principal: Optional[str] = Field(None, description="Motivo principal da consulta")
+    como_conheceu: Optional[str] = Field(None, description="Como conheceu a clínica")
+    preferencia_horario: Optional[str] = Field(None, description="Preferência de horário")
 
-# Add your own schemas here:
-# --------------------------------------------------
+    teve_diagnostico_previo: Optional[bool] = Field(None, description="Se já teve diagnóstico prévio")
+    detalhes_diagnostico: Optional[str] = Field(None, description="Detalhes do diagnóstico, se houver")
 
-# Note: The Flames database viewer will automatically:
-# 1. Read these schemas from GET /schema endpoint
-# 2. Use them for document validation when creating/editing
-# 3. Handle all database operations (CRUD) directly
-# 4. You don't need to create any database endpoints!
+    pronto_para_fechar: Optional[int] = Field(None, ge=1, le=5, description="Nível de prontidão para fechar (1-5)")
+    orcamento_estimado: Optional[str] = Field(None, description="Faixa de orçamento estimada")
+
+    disc_respostas: Optional[List[str]] = Field(None, description="Lista de respostas do questionário DISC (A/B/C/D)")
+    disc_scores: Optional[Dict[str, int]] = Field(None, description="Pontuação por perfil: D, I, S, C")
+    disc_tipo: Optional[str] = Field(None, description="Tipo DISC dominante")
